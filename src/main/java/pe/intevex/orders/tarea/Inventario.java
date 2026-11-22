@@ -7,25 +7,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * SOLUCIÓN DE LA TAREA 1 (solo para el docente).
- * Se resuelve con bucles a propósito: Streams llega en la sesión 3.
+ * Tarea 1 · Inventario.
+ * Resuelto con bucles for (Streams llega en la sesión 3).
  */
 public class Inventario {
 
-    /** Valor total del inventario = suma de (precio × stock) de cada producto. */
+    /** Suma de precio × stock de cada producto. */
     public static BigDecimal valorTotal(List<Product> productos) {
         BigDecimal total = BigDecimal.ZERO;
         for (Product p : productos) {
-            total = total.add(p.getPrice().multiply(BigDecimal.valueOf(p.getStock())));
+            BigDecimal valorProducto = p.getPrice().multiply(BigDecimal.valueOf(p.getStock()));
+            total = total.add(valorProducto);
         }
         return total;
     }
 
-    /** Productos cuyo stock es menor o igual al umbral. */
+    /** Productos con stock menor o igual al umbral. */
     public static List<Product> conPocoStock(List<Product> productos, int umbral) {
         List<Product> resultado = new ArrayList<>();
         for (Product p : productos) {
             if (p.getStock() <= umbral) {
+                resultado.add(p);
+            }
+        }
+        return resultado;
+    }
+
+    /** Extra: productos con stock 0. */
+    public static List<Product> agotados(List<Product> productos) {
+        List<Product> resultado = new ArrayList<>();
+        for (Product p : productos) {
+            if (p.getStock() == 0) {
                 resultado.add(p);
             }
         }

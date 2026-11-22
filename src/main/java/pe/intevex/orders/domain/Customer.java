@@ -1,16 +1,17 @@
 package pe.intevex.orders.domain;
 
+import java.math.BigDecimal;
+
 /** Un cliente de la tienda. */
 public class Customer {
-
     private final String id;
-    private final String fullName;
+    private final String fullname;
     private final String email;
     private final CustomerType type;
 
-    public Customer(String id, String fullName, String email, CustomerType type) {
+    public Customer(String id, String fullname, String email, CustomerType type) {
         this.id = id;
-        this.fullName = fullName;
+        this.fullname = fullname;
         this.email = email;
         this.type = type;
     }
@@ -19,8 +20,8 @@ public class Customer {
         return id;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getFullname() {
+        return fullname;
     }
 
     public String getEmail() {
@@ -33,6 +34,7 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "%s (%s) | %s".formatted(fullName, type, email);
+        return "%s (%s) | %s".formatted(fullname, email, type);
     }
+
 }

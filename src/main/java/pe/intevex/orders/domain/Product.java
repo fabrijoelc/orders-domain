@@ -2,12 +2,7 @@ package pe.intevex.orders.domain;
 
 import java.math.BigDecimal;
 
-/**
- * Un producto que vende la tienda.
- * El precio es BigDecimal: el dinero NUNCA se guarda en double.
- */
 public class Product {
-
     private final String sku;
     private final String name;
     private final BigDecimal price;
@@ -36,8 +31,12 @@ public class Product {
         return stock;
     }
 
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
     @Override
     public String toString() {
-        return "%s | %s | S/ %s | stock %d".formatted(sku, name, price, stock);
+        return "%s | %s | S/ %s | stock %s".formatted(sku, name, price, stock);
     }
 }

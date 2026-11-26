@@ -30,6 +30,11 @@ public record Money(BigDecimal amount, String currency) implements Comparable<Mo
         return new Money(amount, PEN);
     }
 
+    /** Monto en cualquier moneda. Ej.: Money.of("100", "USD"). */
+    public static Money of(String amount, String currency) {
+        return new Money(new BigDecimal(amount), currency);
+    }
+
     public static Money zero() {
         return soles(BigDecimal.ZERO);
     }

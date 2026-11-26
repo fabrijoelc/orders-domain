@@ -92,6 +92,20 @@ public record Money(BigDecimal amount, String currency) {
         return List.copyOf(resultado);
     }
 
+    /**
+     * Recibe un monto que YA incluye IGV y lo separa en [base imponible, IGV].
+     * El IGV se calcula restando (total - base), así base + IGV es exactamente el total.
+     * Ej.: S/ 118.00 con 0.18 -> base S/ 100.00 · IGV S/ 18.00
+     */
+    public Money[] splitIgv(BigDecimal tasa) {
+        if (tasa == null || tasa.signum() < 0) {
+            throw new IllegalArgumentException("La tasa de IGV debe ser 0 o mayor");
+        }
+        BigDecimal base = amount.divide(BigDecimal.ONE.add(tasa), 2, RoundingMode.HALF_UP);
+        BigDecimal igv = amount.subtract(base);
+        return new Money[]{new Money(base, currency), new Money(igv, currency)};
+    }
+
     public boolean isGreaterOrEqualThan(Money other) {
         checkSameCurrency(other);
         return amount.compareTo(other.amount) >= 0;

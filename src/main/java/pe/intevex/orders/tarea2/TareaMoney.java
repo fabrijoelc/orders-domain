@@ -2,6 +2,7 @@ package pe.intevex.orders.tarea2;
 
 import pe.intevex.orders.domain.Money;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -10,9 +11,12 @@ import java.util.List;
  */
 public class TareaMoney {
 
+    private static final BigDecimal IGV = new BigDecimal("0.18");
+
     public static void main(String[] args) {
         suma();
         repartir();
+        igv();
     }
 
     private static void suma() {
@@ -39,5 +43,24 @@ public class TareaMoney {
         System.out.println(Money.soles("10.00").split(4));
         // Compruebo que no se perdió ni apareció ningún céntimo
         System.out.println("Suma de las partes: " + Money.sum(partes));
+    }
+
+    private static void igv() {
+        System.out.println("\n=== 3. IGV ===");
+        imprimirIgv(Money.soles("118.00"));
+        imprimirIgv(Money.soles("100.00"));
+
+        // ¿Y si calculo el IGV multiplicando la base por 0.18 en vez de restar? Con S/ 100.00:
+        //   base = 100.00 / 1.18 = 84.7457... -> S/ 84.75
+        //   IGV  = 84.75 x 0.18  = 15.255     -> S/ 15.26
+        //   base + IGV = S/ 100.01 -> aparece un céntimo que el cliente nunca pagó.
+        // No conviene porque se redondea dos veces (la base y después el IGV) y los dos errores
+        // se suman. Restando (IGV = total - base) solo se redondea la base y el IGV se queda con
+        // la diferencia, así base + IGV siempre da exactamente el total.
+    }
+
+    private static void imprimirIgv(Money total) {
+        Money[] partes = total.splitIgv(IGV);
+        System.out.println(total + " -> base " + partes[0] + " | IGV " + partes[1]);
     }
 }

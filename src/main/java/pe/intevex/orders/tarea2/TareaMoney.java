@@ -3,6 +3,8 @@ package pe.intevex.orders.tarea2;
 import pe.intevex.orders.domain.Money;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -17,6 +19,7 @@ public class TareaMoney {
         suma();
         repartir();
         igv();
+        ordenarYComparar();
     }
 
     private static void suma() {
@@ -62,5 +65,22 @@ public class TareaMoney {
     private static void imprimirIgv(Money total) {
         Money[] partes = total.splitIgv(IGV);
         System.out.println(total + " -> base " + partes[0] + " | IGV " + partes[1]);
+    }
+
+    private static void ordenarYComparar() {
+        System.out.println("\n=== 4. Ordenar y comparar ===");
+        List<Money> precios = new ArrayList<>(List.of(
+                Money.soles("50"), Money.soles("9.90"), Money.soles("120.5"), Money.soles("9.9")));
+        Collections.sort(precios);
+        System.out.println(precios);
+        System.out.println("Mayor: " + Collections.max(precios));
+
+        // Dan resultados distintos porque:
+        // - Money normaliza el monto a 2 decimales en el constructor compacto, entonces "10" y
+        //   "10.00" quedan los dos como 10.00, y el equals del record compara monto y moneda.
+        // - El equals de BigDecimal compara el valor Y la escala: 10 (escala 0) y 10.00 (escala 2)
+        //   valen lo mismo pero no son "iguales". Para comparar solo el valor se usa compareTo.
+        System.out.println("Money equals: " + Money.soles("10").equals(Money.soles("10.00")));
+        System.out.println("BigDecimal equals: " + new BigDecimal("10").equals(new BigDecimal("10.00")));
     }
 }

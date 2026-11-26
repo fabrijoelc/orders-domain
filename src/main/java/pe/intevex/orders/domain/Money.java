@@ -10,7 +10,7 @@ import java.util.Objects;
  * Dinero: un monto y una moneda. Es inmutable: cada operación devuelve un Money nuevo.
  * El constructor compacto valida y normaliza a 2 decimales.
  */
-public record Money(BigDecimal amount, String currency) {
+public record Money(BigDecimal amount, String currency) implements Comparable<Money> {
 
     public static final String PEN = "PEN";
 
@@ -113,6 +113,13 @@ public record Money(BigDecimal amount, String currency) {
 
     public boolean isNegative() {
         return amount.signum() < 0;
+    }
+
+    /** Ordena por monto. Comparar monedas distintas lanza IllegalArgumentException. */
+    @Override
+    public int compareTo(Money other) {
+        checkSameCurrency(other);
+        return amount.compareTo(other.amount);
     }
 
     private void checkSameCurrency(Money other) {

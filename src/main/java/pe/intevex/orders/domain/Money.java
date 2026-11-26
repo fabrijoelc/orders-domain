@@ -2,6 +2,7 @@ package pe.intevex.orders.domain;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -30,6 +31,19 @@ public record Money(BigDecimal amount, String currency) {
 
     public static Money zero() {
         return soles(BigDecimal.ZERO);
+    }
+
+    /** Suma una lista de montos de la misma moneda. Si la lista está vacía devuelve S/ 0.00. */
+    public static Money sum(List<Money> montos) {
+        if (montos.isEmpty()) {
+            return zero();
+        }
+        // Empiezo en 0 con la moneda del primer monto para poder sumar soles, dólares, etc.
+        Money total = new Money(BigDecimal.ZERO, montos.get(0).currency());
+        for (Money m : montos) {
+            total = total.add(m);
+        }
+        return total;
     }
 
     public Money add(Money other) {

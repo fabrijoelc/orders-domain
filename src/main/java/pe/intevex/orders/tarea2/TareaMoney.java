@@ -1,5 +1,6 @@
 package pe.intevex.orders.tarea2;
 
+import pe.intevex.orders.domain.ExchangeRate;
 import pe.intevex.orders.domain.Money;
 
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ public class TareaMoney {
         repartir();
         igv();
         ordenarYComparar();
+        tipoDeCambio();
     }
 
     private static void suma() {
@@ -82,5 +84,42 @@ public class TareaMoney {
         //   valen lo mismo pero no son "iguales". Para comparar solo el valor se usa compareTo.
         System.out.println("Money equals: " + Money.soles("10").equals(Money.soles("10.00")));
         System.out.println("BigDecimal equals: " + new BigDecimal("10").equals(new BigDecimal("10.00")));
+    }
+
+    private static void tipoDeCambio() {
+        System.out.println("\n=== 5. Tipo de cambio ===");
+        ExchangeRate usdPen = ExchangeRate.of("usd", " PEN ", "3.75");
+        Money dolares = Money.of("100", "USD");
+        Money soles = usdPen.convert(dolares);
+        ExchangeRate penUsd = usdPen.inverse();
+
+        System.out.println(usdPen);
+        System.out.println(dolares + " -> " + soles);
+        System.out.println(penUsd);
+
+        // De vuelta sale USD 100.01 y no USD 100.00. El céntimo sale del redondeo de la tasa
+        // inversa: 1 / 3.75 = 0.26666... pero se guarda con 4 decimales como 0.2667, un poquito
+        // más que el valor real. Al multiplicar, ese error crece: 375.00 x 0.2667 = 100.0125,
+        // que redondeado da USD 100.01.
+        // En un sistema real no convertiría de ida y vuelta con la tasa inversa redondeada:
+        // guardaría el monto original y la tasa usada en cada operación, y si tengo que volver
+        // dividiría entre la tasa original (375.00 / 3.75 = 100.00), redondeando una sola vez al final.
+        System.out.println(soles + " -> " + penUsd.convert(soles));
+
+        // Casos que tienen que lanzar error
+        probarError(() -> usdPen.convert(Money.soles("10")));
+        probarError(() -> ExchangeRate.of("USD", "usd", "3.75"));
+        probarError(() -> ExchangeRate.of("USD", "PEN", "0"));
+        probarError(() -> ExchangeRate.of("DOLAR", "PEN", "3.75"));
+    }
+
+    /** Ejecuta la acción y, si lanza IllegalArgumentException, imprime el mensaje del error. */
+    private static void probarError(Runnable accion) {
+        try {
+            accion.run();
+            System.out.println("No lanzó error y debía lanzarlo");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }

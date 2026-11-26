@@ -2,6 +2,7 @@ package pe.intevex.orders.domain;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,6 +64,32 @@ public record Money(BigDecimal amount, String currency) {
     /** Porcentaje del monto. Ej.: 0.10 = 10%. */
     public Money percentage(BigDecimal rate) {
         return new Money(amount.multiply(rate), currency);
+    }
+
+    /**
+     * Reparte el monto en partes iguales sin perder ni inventar céntimos.
+     * Si no sale exacto, los céntimos que sobran se dan uno a uno a las primeras partes.
+     * Ej.: S/ 100.00 en 3 -> [S/ 33.34, S/ 33.33, S/ 33.33]
+     */
+    public List<Money> split(int partes) {
+        if (partes <= 0) {
+            throw new IllegalArgumentException("El número de partes debe ser mayor a 0");
+        }
+        BigDecimal cantidad = BigDecimal.valueOf(partes);
+        // Parte base truncada a 2 decimales: 100.00 / 3 = 33.33
+        BigDecimal base = amount.divide(cantidad, 2, RoundingMode.DOWN);
+        // Lo que no se pudo repartir: 100.00 - 33.33 * 3 = 0.01 -> sobra 1 céntimo
+        BigDecimal sobrante = amount.subtract(base.multiply(cantidad));
+        int centimosQueSobran = sobrante.abs().movePointRight(2).intValueExact();
+        // Si el monto es negativo lo que "sobra" también es negativo
+        BigDecimal centimo = sobrante.signum() < 0 ? new BigDecimal("-0.01") : new BigDecimal("0.01");
+
+        List<Money> resultado = new ArrayList<>();
+        for (int i = 0; i < partes; i++) {
+            BigDecimal parte = i < centimosQueSobran ? base.add(centimo) : base;
+            resultado.add(new Money(parte, currency));
+        }
+        return List.copyOf(resultado);
     }
 
     public boolean isGreaterOrEqualThan(Money other) {

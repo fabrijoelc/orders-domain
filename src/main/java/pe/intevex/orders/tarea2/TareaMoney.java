@@ -12,6 +12,7 @@ public class TareaMoney {
 
     public static void main(String[] args) {
         suma();
+        repartir();
     }
 
     private static void suma() {
@@ -29,5 +30,14 @@ public class TareaMoney {
 
         System.out.println(Money.sum(precios));
         System.out.println(Money.sum(List.of()));
+    }
+
+    private static void repartir() {
+        System.out.println("\n=== 2. Repartir ===");
+        List<Money> partes = Money.soles("100.00").split(3);
+        System.out.println(partes);
+        System.out.println(Money.soles("10.00").split(4));
+        // Compruebo que no se perdió ni apareció ningún céntimo
+        System.out.println("Suma de las partes: " + Money.sum(partes));
     }
 }
